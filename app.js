@@ -1,5 +1,5 @@
 //jshint esversion:6
-
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -13,9 +13,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-mongoose.connect(
-  "mongodb+srv://akakhtarsbg:4409atif@cluster0.szmlwck.mongodb.net/todolistDB?retryWrites=true&w=majority"
-);
+mongoose.connect(process.env.CONNECTION_LINK);
 
 const itemsSchema = new Schema({
   name: String,
@@ -60,8 +58,8 @@ app.get("/", function (req, res) {
 });
 
 app.get("/:customListName", function (req, res) {
-  const customListName =_.capitalize(req.params.customListName);
-   
+  const customListName = _.capitalize(req.params.customListName);
+
   async function findRoute() {
     const result = await List.findOne({ name: customListName }).then(function (
       x
@@ -115,13 +113,13 @@ app.post("/delete", function (req, res) {
     res.redirect("/");
   } else {
     async function findAndUpdate() {
-     await List.findOneAndUpdate(
+      await List.findOneAndUpdate(
         { name: listName },
-        { $pull: { items: { _id: checkedItemId } } });
-    }    
+        { $pull: { items: { _id: checkedItemId } } }
+      );
+    }
     findAndUpdate();
-      res.redirect("/" + listName);
-    
+    res.redirect("/" + listName);
   }
 });
 
